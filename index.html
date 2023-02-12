@@ -12,6 +12,17 @@
 			<p>You entered your OpenAI API Key.</p>
 			<button id="change_key_button">Change key</button>
 		</div>
+		<div id="cv_needed">
+			<p>Choose your CV</p>
+			<input type="file" id="cv_file" />
+		</div>
+		<div id="cv_entered">
+			<p>You entered your CV (<a id="cv" href="#">view</a>)</p>
+			<button id="change_cv_button">Change CV</button>
+		</div>
+		<p id="loading">Processing...</p>
 	</body>
-	<script src="index.js"></script>
+	<script src="pdf.worker.js"></script>
+	<script src="pdf.js"></script>
+	<script src="index.js" type="module"></script>
 </html>

@@ -56,7 +56,7 @@ const generateCompletionAction = async (info) => {
 			type: 'basic',
 			iconUrl: '../assets/logo-128.png',
 			title: 'Operi',
-			message: 'Let the magic happen...',
+			message: 'Let the magic happen 🪄...',
 		});
 
 		const { selectionText } = info;
@@ -84,7 +84,13 @@ const generateCompletionAction = async (info) => {
 
 		sendMessage(completion.text);
 	} catch (error) {
-		sendMessage(error.toString());
+		await chrome.notifications.create('error', {
+			type: 'basic',
+			iconUrl: '../assets/logo-128.png',
+			title: 'Operi',
+			message: 'Oops 😬, something went wrong.',
+		});
+		// sendMessage(error.toString());
 	}
 };
 chrome.runtime.onInstalled.addListener(() => {

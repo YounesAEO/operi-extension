@@ -1,8 +1,8 @@
-const getKey = () => {
+const getKey = async (key) => {
 	return new Promise((resolve, reject) => {
-		chrome.storage.local.get(['openai-key'], (result) => {
-			if (result['openai-key']) {
-				const decodedKey = atob(result['openai-key']);
+		chrome.storage.local.get([key], (result) => {
+			if (result[key]) {
+				const decodedKey = atob(result[key]);
 				resolve(decodedKey);
 			}
 		});
@@ -24,7 +24,7 @@ const sendMessage = (content) => {
 	});
 };
 const generate = async (prompt) => {
-	const key = await getKey();
+	const openaiKey = await getKey('openai-key');
 	const url = 'https://api.openai.com/v1/completions';
 
 	// Call completions endpoint
@@ -32,7 +32,7 @@ const generate = async (prompt) => {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${key}`,
+			Authorization: `Bearer ${openaiKey}`,
 		},
 		body: JSON.stringify({
 			model: 'text-davinci-003',
@@ -49,17 +49,38 @@ const generate = async (prompt) => {
 
 const generateCompletionAction = async (info) => {
 	try {
-		sendMessage('generating...');
+		// sendMessage('generating...');
+
+		// show chrome notification
+		await chrome.notifications.create('generating', {
+			type: 'basic',
+			iconUrl: '../assets/logo-128.png',
+			title: 'Operi',
+			message: 'Let the magic happen...',
+		});
+
 		const { selectionText } = info;
+		const cvContent = await getKey('cv-content');
 		const basePromptPrefix = `
-        Write me a detailed table of contents for a blog post with the title below.
+        Write me a detailed cover letter for the job posting below based on the information provided in CV below.
     
-        Title:
+		CV: 
+		${cvContent}
+        Job Posting:
+		
         `;
 
 		const completion = await generate(
 			`${basePromptPrefix}${selectionText}`
 		);
+
+		await chrome.notifications.create('done', {
+			type: 'basic',
+			iconUrl: '../assets/logo-128.png',
+			title: 'Operi',
+			message:
+				'Yay 🎉, your cover letter is ready! Ctrl + V to paste it.',
+		});
 
 		sendMessage(completion.text);
 	} catch (error) {
